@@ -51,7 +51,15 @@ export const ProfileCard = memo(function ProfileCard({ profile, platform }: Prop
       aria-label={`${profile.fullname} profile`}
     >
       <div className="flex items-start justify-between gap-4">
-        <img src={profile.picture} alt={`${profile.fullname} avatar`} loading="lazy" className="avatar-ring w-[68px] h-[68px] rounded-full object-cover" />
+        <img 
+          src={profile.picture} 
+          alt={`${profile.fullname} avatar`} 
+          loading="lazy" 
+          className="avatar-ring w-[68px] h-[68px] rounded-full object-cover" 
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.fullname || handle)}&background=333333&color=ffffff&size=68`;
+          }}
+        />
         <div className="platform-chip">
           {getPlatformIcon(platform)}
           <span>{getPlatformLabel(platform)}</span>
