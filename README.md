@@ -29,10 +29,10 @@ A modern, polished influencer discovery app built with **React 19**, **TypeScrip
 
 ### 2. UI/UX Redesign
 
-- **Brand identity**: Prussian Blue (#1F4072) + Butter Yellow (#FFF3B4) color palette
+- **Brand identity**: Deep Navy (`#0A1931`), Ocean Blue (`#1A3D63`), and Ice Blue (`#B3CFE5`)
 - **Typography**: Inter font from Google Fonts
-- **Responsive layout**: 2-column grid on desktop, single column on mobile
-- **Modern card design**: Rounded corners, subtle shadows, hover elevation effects
+- **Responsive layout**: Fully centered responsive grid across all screen sizes
+- **Modern UI Aesthetic**: Comprehensive Glassmorphism with `LiquidEther` animated backgrounds and `GlareHover` cards
 - **Animated transitions**: Framer Motion page transitions + stagger animations on card lists
 - **Skeleton loaders**: Shimmer loading states instead of plain "Loading..." text
 - **Beautiful empty states**: Custom icons and messaging for no results / empty list
