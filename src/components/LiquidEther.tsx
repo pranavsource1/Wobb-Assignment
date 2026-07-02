@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
@@ -788,7 +789,7 @@ export default function LiquidEther({
           wrapS: THREE.ClampToEdgeWrapping,
           wrapT: THREE.ClampToEdgeWrapping
         };
-        for (let key in this.fbos) {
+        for (const key in this.fbos) {
           this.fbos[key] = new THREE.WebGLRenderTarget(this.fboSize.x, this.fboSize.y, opts);
         }
       }
@@ -847,7 +848,7 @@ export default function LiquidEther({
       }
       resize() {
         this.calcSize();
-        for (let key in this.fbos) {
+        for (const key in this.fbos) {
           this.fbos[key].setSize(this.fboSize.x, this.fboSize.y);
         }
       }
@@ -999,7 +1000,7 @@ export default function LiquidEther({
             Common.renderer.dispose();
             Common.renderer.forceContextLoss();
           }
-        } catch (e) {
+        } catch {
           void 0;
         }
       }
@@ -1079,14 +1080,14 @@ export default function LiquidEther({
       if (resizeObserverRef.current) {
         try {
           resizeObserverRef.current.disconnect();
-        } catch (e) {
+        } catch {
           void 0;
         }
       }
       if (intersectionObserverRef.current) {
         try {
           intersectionObserverRef.current.disconnect();
-        } catch (e) {
+        } catch {
           void 0;
         }
       }
