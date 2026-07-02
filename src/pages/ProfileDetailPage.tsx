@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { ArrowLeft, Check, ExternalLink, Plus, UserX } from "lucide-react";
+import { ArrowLeft, Check, ExternalLink, Plus, UserX, Instagram, Youtube, Music } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { ProfileDetailSkeleton } from "@/components/Skeleton";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
@@ -22,11 +22,19 @@ interface DetailState {
   data: ProfileDetailResponse | null;
 }
 
+const getPlatformIcon = (platform: Platform) => {
+  switch (platform) {
+    case 'instagram': return <Instagram size={14} />;
+    case 'youtube': return <Youtube size={14} />;
+    case 'tiktok': return <Music size={14} />;
+  }
+};
+
 function StatCard({ label, value }: StatProps) {
   return (
-    <div className="stat-card">
-      <div className="stat-label">{label}</div>
-      <div className="stat-value">{value}</div>
+    <div className="metric-tile h-full">
+      <div className="text-xs font-bold uppercase text-light-blue/65">{label}</div>
+      <div className="mt-2 text-2xl font-extrabold text-off-white">{value}</div>
     </div>
   );
 }
@@ -125,57 +133,74 @@ export function ProfileDetailPage() {
 
   return (
     <Layout>
-      <div className="detail-wrap">
-        <Link to="/" className="back-link">
-          <ArrowLeft size={16} />
-          Back to search
-        </Link>
+      <div className="max-w-5xl mx-auto w-full">
+        <div className="mb-6">
+          <Link to="/" className="button-ghost w-fit">
+            <ArrowLeft size={18} />
+            Back to search
+          </Link>
+        </div>
 
         <motion.section
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="detail-panel"
           aria-labelledby="profile-title"
         >
-          <div className="detail-header">
-            <div className="detail-avatar">
-              <img src={user.picture} alt={`${user.fullname} avatar`} />
-            </div>
+          <div className="profile-hero mb-7 p-6 sm:p-8 lg:p-10">
+            <div className="grid gap-8 lg:grid-cols-[180px_minmax(0,1fr)] lg:items-center">
+              <img src={user.picture} alt={`${user.fullname} avatar`} className="avatar-ring w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover mx-auto lg:mx-0" />
 
-            <div>
-              <div className="platform-pill">{getPlatformLabel(platform)}</div>
-              <div className="detail-title-row" style={{ marginTop: 16 }}>
-                <h1 id="profile-title" className="detail-title">{user.fullname}</h1>
-                <VerifiedBadge verified={user.is_verified} />
+              <div className="min-w-0 text-center lg:text-left">
+                <div className="platform-chip mb-4 mx-auto lg:mx-0">
+                  {getPlatformIcon(platform)}
+                  <span>{getPlatformLabel(platform)}</span>
+                </div>
+
+                <div className="flex items-center justify-center lg:justify-start gap-3">
+                  <h1 id="profile-title" className="min-w-0 text-3xl md:text-4xl font-extrabold text-off-white leading-tight">{user.fullname}</h1>
+                  <VerifiedBadge verified={user.is_verified} />
+                </div>
+
+                <p className="mt-2 text-lg text-muted-white font-semibold">@{handle}</p>
+
+                {user.description && (
+                  <p className="mt-5 text-sm sm:text-base text-muted-white leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                    {user.description}
+                  </p>
+                )}
+
+                <div className="mt-7 flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3">
+                  <button
+                    type="button"
+                    onClick={handleToggle}
+                    className={`${inList ? "button-secondary" : "button-primary"} w-full sm:w-auto`}
+                  >
+                    {inList ? <><Check size={18} /> Saved</> : <><Plus size={18} /> Add to List</>}
+                  </button>
+                  {user.url && (
+                    <a
+                      href={user.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="button-ghost w-full sm:w-auto"
+                    >
+                      <ExternalLink size={18} />
+                      View Profile
+                    </a>
+                  )}
+                </div>
               </div>
-              <p className="detail-handle">@{handle}</p>
-              {user.description && <p className="detail-description">{user.description}</p>}
-            </div>
-
-            <div className="detail-actions">
-              <button
-                type="button"
-                onClick={handleToggle}
-                className={`save-button ${inList ? "saved" : ""}`}
-              >
-                {inList ? <><Check size={16} /> Saved</> : <><Plus size={16} /> Add to List</>}
-              </button>
-              {user.url && (
-                <a href={user.url} target="_blank" rel="noopener noreferrer" className="external-link">
-                  <ExternalLink size={16} />
-                  View Profile
-                </a>
-              )}
             </div>
           </div>
 
-          <div className="detail-stats">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.04 }}
+                className="h-full"
               >
                 <StatCard {...stat} />
               </motion.div>
@@ -189,13 +214,15 @@ export function ProfileDetailPage() {
 
 function EmptyDetail({ title }: { title: string }) {
   return (
-    <div className="not-found-panel">
-      <div>
-        <UserX size={42} />
-        <h3>{title}</h3>
-        <p>The selected creator does not have a detail profile in the local data.</p>
-        <Link to="/" className="back-link" style={{ marginTop: 18 }}>
-          <ArrowLeft size={16} />
+    <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+      <div className="surface-panel rounded-cards p-8 sm:p-10 max-w-md w-full flex flex-col items-center">
+        <div className="w-16 h-16 rounded-full bg-white/[0.08] flex items-center justify-center mb-5">
+          <UserX size={34} className="text-light-blue/60" />
+        </div>
+        <h3 className="text-2xl font-extrabold text-off-white mb-3">{title}</h3>
+        <p className="text-muted-white leading-relaxed mb-7">The selected creator does not have a detail profile in the local data.</p>
+        <Link to="/" className="button-ghost">
+          <ArrowLeft size={18} />
           Back to search
         </Link>
       </div>

@@ -12,18 +12,19 @@ createRoot(document.getElementById("root")!).render(
       toastOptions={{
         duration: 2500,
         style: {
-          background: "#ffffff",
-          color: "#0f172a",
-          border: "1px solid #e2e8f0",
-          borderRadius: "12px",
+          background: "rgba(7, 20, 38, 0.92)",
+          color: "#f7fbff",
+          border: "1px solid rgba(191, 227, 247, 0.22)",
+          borderRadius: "14px",
           fontSize: "14px",
           fontFamily: "'Inter', system-ui, sans-serif",
-          boxShadow: "0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04)",
+          boxShadow: "0 18px 48px rgba(0,0,0,0.28)",
+          backdropFilter: "blur(18px)",
         },
         success: {
           iconTheme: {
-            primary: "#1F4072",
-            secondary: "#FFF3B4",
+            primary: "#83f2d1",
+            secondary: "#071426",
           },
         },
       }}

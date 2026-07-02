@@ -1,4 +1,4 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, type KeyboardEvent, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import type { Platform, UserProfileSummary } from "@/types";
@@ -6,9 +6,17 @@ import { getPlatformLabel } from "@/utils/dataHelpers";
 import { formatEngagementRate, formatFollowers } from "@/utils/formatters";
 import { useListStore } from "@/store/useListStore";
 import { VerifiedBadge } from "./VerifiedBadge";
-import { Check, Plus } from "lucide-react";
+import { Check, Plus, Instagram, Youtube, Music } from "lucide-react";
 
 interface Props { profile: UserProfileSummary; platform: Platform; }
+
+const getPlatformIcon = (platform: Platform) => {
+  switch (platform) {
+    case 'instagram': return <Instagram size={14} />;
+    case 'youtube': return <Youtube size={14} />;
+    case 'tiktok': return <Music size={14} />;
+  }
+};
 
 export const ProfileCard = memo(function ProfileCard({ profile, platform }: Props) {
   const navigate = useNavigate();
@@ -20,57 +28,67 @@ export const ProfileCard = memo(function ProfileCard({ profile, platform }: Prop
 
   const handleClick = useCallback(() => navigate(`/profile/${handle}?platform=${platform}`), [navigate, handle, platform]);
 
-  const handleToggle = useCallback((e: React.MouseEvent) => {
+  const handleToggle = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     if (inList) { removeProfile(profile.user_id); toast.success(`Removed ${profile.fullname}`); }
     else { const ok = addProfile(profile, platform); if (ok) toast.success(`Added ${profile.fullname}`); else toast.error("Already in list"); }
   }, [inList, profile, platform, addProfile, removeProfile]);
 
+  const handleCardKeyDown = useCallback((event: KeyboardEvent<HTMLElement>) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleClick();
+    }
+  }, [handleClick]);
+
   return (
-    <div 
-      onClick={handleClick} 
-      className={`profile-card platform-${platform}`}
-      role="article" 
+    <article
+      onClick={handleClick}
+      onKeyDown={handleCardKeyDown}
+      tabIndex={0}
+      className="creator-card"
       aria-label={`${profile.fullname} profile`}
     >
-      <div className="profile-top">
-        <div className="avatar-wrap">
-          <img src={profile.picture} alt={`${profile.fullname} avatar`} loading="lazy" />
+      <div className="flex items-start justify-between gap-4">
+        <img src={profile.picture} alt={`${profile.fullname} avatar`} loading="lazy" className="avatar-ring w-[68px] h-[68px] rounded-full object-cover" />
+        <div className="platform-chip">
+          {getPlatformIcon(platform)}
+          <span>{getPlatformLabel(platform)}</span>
         </div>
-        <span className="platform-pill">{getPlatformLabel(platform)}</span>
       </div>
 
-      <div>
-        <div className="profile-name-row">
-          <h3 className="profile-name">{profile.fullname}</h3>
+      <div className="min-w-0">
+        <div className="flex items-center gap-2">
+          <h3 className="min-w-0 truncate text-xl font-extrabold text-off-white">{profile.fullname}</h3>
           <VerifiedBadge verified={profile.is_verified} />
         </div>
-        <p className="profile-handle">@{handle}</p>
+        <p className="mt-1 truncate text-sm font-semibold text-muted-white">@{handle}</p>
       </div>
 
-      <div className="profile-metrics">
-        <div className="metric">
-          <strong>{formatFollowers(profile.followers)}</strong>
-          <span>Followers</span>
+      <div className="grid grid-cols-3 gap-2 mt-auto">
+        <div className="card-stat">
+          <strong className="block truncate text-sm font-extrabold text-off-white">{formatFollowers(profile.followers)}</strong>
+          <span className="mt-1 block text-xs font-semibold text-light-blue/65">Followers</span>
         </div>
-        <div className="metric">
-          <strong>{formatEngagementRate(profile.engagement_rate)}</strong>
-          <span>Engage</span>
+        <div className="card-stat">
+          <strong className="block truncate text-sm font-extrabold text-off-white">{formatEngagementRate(profile.engagement_rate)}</strong>
+          <span className="mt-1 block text-xs font-semibold text-light-blue/65">Engage</span>
         </div>
-        <div className="metric">
-          <strong>{formatFollowers(profile.engagements ?? profile.avg_views ?? 0)}</strong>
-          <span>{profile.engagements ? "Actions" : "Views"}</span>
+        <div className="card-stat">
+          <strong className="block truncate text-sm font-extrabold text-off-white">{formatFollowers(profile.engagements ?? profile.avg_views ?? 0)}</strong>
+          <span className="mt-1 block text-xs font-semibold text-light-blue/65">{profile.engagements ? "Actions" : "Views"}</span>
         </div>
       </div>
 
-      <button 
+      <button
         type="button"
-        onClick={handleToggle} 
-        className={`save-button ${inList ? "saved" : ""}`}
+        onClick={handleToggle}
+        className={`${inList ? "button-secondary" : "button-primary"} w-full`}
         aria-label={inList ? "Remove from list" : "Add to list"}
       >
         {inList ? <><Check size={16} /><span>Saved</span></> : <><Plus size={16} /><span>Add to List</span></>}
       </button>
-    </div>
+    </article>
   );
 });
